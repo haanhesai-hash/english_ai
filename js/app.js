@@ -186,6 +186,33 @@ class App {
       tabAuthBackup.addEventListener('click', () => this.switchAuthTab('backup'));
     }
 
+    // Quick Gmail One-Touch Login / Auto-Registration
+    const formQuickGmail = document.getElementById('form-quick-gmail');
+    if (formQuickGmail) {
+      formQuickGmail.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('quick-gmail-input');
+        const email = input ? input.value : '';
+        const msgEl = document.getElementById('quick-gmail-msg');
+        try {
+          const res = this.storage.loginOrRegisterWithGmail(email);
+          this.closeAuthModal();
+          this.updateHeaderUI();
+          this.navigateTo(this.currentView);
+          if (res.isNew) {
+            this.showToast(`Chào mừng bạn! Đã khởi tạo lộ trình học mới cho '${res.account.email}'`);
+          } else {
+            this.showToast(`Chào mừng ${res.account.name} quay trở lại! Đã tải lộ trình.`);
+          }
+        } catch (err) {
+          if (msgEl) {
+            msgEl.textContent = err.message;
+            msgEl.classList.remove('hidden');
+          }
+        }
+      });
+    }
+
     // Login form submit
     const formLogin = document.getElementById('form-auth-login');
     if (formLogin) {
@@ -195,11 +222,11 @@ class App {
         const password = document.getElementById('login-password').value;
         const errEl = document.getElementById('login-error-msg');
         try {
-          this.storage.login(email, password);
+          const acc = this.storage.login(email, password);
           this.closeAuthModal();
           this.updateHeaderUI();
           this.navigateTo(this.currentView);
-          this.showToast(`Chào mừng ${this.storage.currentUser.name} quay trở lại!`);
+          this.showToast(`Chào mừng ${acc.name} quay trở lại!`);
         } catch (err) {
           if (errEl) {
             errEl.textContent = err.message;

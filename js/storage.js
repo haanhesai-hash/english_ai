@@ -179,14 +179,84 @@ export class StorageService {
   }
 
   /**
-   * Đăng nhập học viên bằng Gmail
+   * Đăng nhập hoặc Tạo tài khoản tức thì bằng tài khoản Gmail có sẵn
+   * Tự động nhận diện: Nếu đã có thì đăng nhập, nếu chưa có thì tự động tạo mới
+   * Không bắt buộc nhập mật khẩu rườm rà.
+   */
+  loginOrRegisterWithGmail(email, name = "", avatarUrl = "") {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      throw new Error("Vui lòng nhập địa chỉ Gmail hợp lệ (ví dụ: student@gmail.com).");
+    }
+
+    // Nếu tài khoản đã tồn tại trên thiết bị
+    if (this.accounts[cleanEmail]) {
+      this.currentUser = this.accounts[cleanEmail];
+      if (name && (!this.currentUser.name || this.currentUser.name === 'Học viên')) {
+        this.currentUser.name = name.trim();
+      }
+      if (avatarUrl && !this.currentUser.avatarUrl) {
+        this.currentUser.avatarUrl = avatarUrl;
+      }
+      this.save();
+      this.updateStreak();
+      return { isNew: false, account: this.currentUser };
+    }
+
+    // Nếu chưa tồn tại, tự động tạo hồ sơ học viên mới từ Gmail
+    let formattedName = name ? name.trim() : '';
+    if (!formattedName) {
+      const prefix = cleanEmail.split('@')[0];
+      formattedName = prefix
+        .replace(/[._\-+]/g, ' ')
+        .split(' ')
+        .filter(Boolean)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      if (!formattedName) formattedName = "Học viên " + prefix;
+    }
+
+    const colors = ["brand", "indigo", "purple", "emerald", "teal", "rose", "amber"];
+    const avatarColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const newAccount = {
+      name: formattedName,
+      email: cleanEmail,
+      avatarUrl: avatarUrl || '',
+      password: "",
+      targetLevel: "B2",
+      joinedDate: new Date().toLocaleDateString('vi-VN'),
+      avatarColor,
+      profile: {
+        level: "Chưa kiểm tra",
+        cefrBadge: "A1",
+        streak: 1,
+        lastActiveDate: new Date().toISOString().slice(0, 10),
+        totalMinutesStudied: 0,
+        completedModules: [],
+        bookmarks: { ipa: [], morphology: [], grammar: [] },
+        flashcards: {},
+        testHistory: []
+      }
+    };
+
+    this.accounts[cleanEmail] = newAccount;
+    this.currentUser = newAccount;
+    this.save();
+    return { isNew: true, account: newAccount };
+  }
+
+  /**
+   * Đăng nhập học viên bằng Gmail (Tự động nhận diện tài khoản)
    */
   login(email, password = "") {
     const cleanEmail = email.trim().toLowerCase();
     const account = this.accounts[cleanEmail];
 
     if (!account) {
-      throw new Error(`Không tìm thấy học sinh với Gmail '${cleanEmail}'. Vui lòng tạo tài khoản mới.`);
+      // Nếu chưa có tài khoản trên máy, tự động tạo mới giúp học sinh
+      const result = this.loginOrRegisterWithGmail(cleanEmail);
+      return result.account;
     }
 
     if (account.password && password && account.password !== String(password)) {
