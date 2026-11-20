@@ -45,6 +45,11 @@ class App {
     this.bindGlobalEvents();
     this.updateHeaderUI();
     this.navigateTo('roadmap');
+
+    // Automatically show onboarding guide on first visit
+    if (localStorage.getItem('seen_onboarding_guide') !== 'true') {
+      setTimeout(() => this.openGuideModal(), 600);
+    }
   }
 
   bindGlobalEvents() {
@@ -118,6 +123,35 @@ class App {
         sidebar.classList.toggle('left-0');
         sidebar.classList.toggle('z-50');
         sidebar.classList.toggle('shadow-2xl');
+      });
+    }
+
+    // Guide modal controls
+    const btnOpenGuideHeader = document.getElementById('btn-open-guide-header');
+    if (btnOpenGuideHeader) {
+      btnOpenGuideHeader.addEventListener('click', () => this.openGuideModal());
+    }
+
+    const btnOpenGuideSidebar = document.getElementById('btn-open-guide-sidebar');
+    if (btnOpenGuideSidebar) {
+      btnOpenGuideSidebar.addEventListener('click', () => this.openGuideModal());
+    }
+
+    const closeGuideModal = document.getElementById('close-guide-modal');
+    if (closeGuideModal) {
+      closeGuideModal.addEventListener('click', () => this.closeGuideModal());
+    }
+
+    const btnGuideCloseBtn = document.getElementById('btn-guide-close-btn');
+    if (btnGuideCloseBtn) {
+      btnGuideCloseBtn.addEventListener('click', () => this.closeGuideModal());
+    }
+
+    const btnGuideStartTest = document.getElementById('btn-guide-start-test');
+    if (btnGuideStartTest) {
+      btnGuideStartTest.addEventListener('click', () => {
+        this.closeGuideModal();
+        this.navigateTo('diagnostic');
       });
     }
 
@@ -252,13 +286,17 @@ class App {
             </p>
 
             <div class="pt-2 flex flex-wrap gap-3">
+              <button id="btn-hero-guide" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all">
+                <i data-lucide="compass" class="w-4 h-4"></i>
+                <span>Hướng Dẫn Lộ Trình & Phương Pháp</span>
+              </button>
               <button id="btn-start-diag" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all">
                 <i data-lucide="target" class="w-4 h-4"></i>
-                <span>Kiểm tra Chẩn đoán Trình độ Ngay (Miễn phí)</span>
+                <span>Kiểm tra Chẩn đoán Trình độ Ngay</span>
               </button>
               <button id="btn-goto-ipa" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 border border-white/20 transition-all">
                 <i data-lucide="mic" class="w-4 h-4 text-brand-300"></i>
-                <span>Vào Phòng Lab Ngữ âm IPA</span>
+                <span>Phòng Lab Ngữ âm IPA</span>
               </button>
             </div>
           </div>
@@ -376,6 +414,11 @@ class App {
         this.renderRoadmap(container);
       });
     });
+
+    const btnHeroGuide = container.querySelector('#btn-hero-guide');
+    if (btnHeroGuide) {
+      btnHeroGuide.addEventListener('click', () => this.openGuideModal());
+    }
 
     const btnStartDiag = container.querySelector('#btn-start-diag');
     if (btnStartDiag) {
@@ -1956,6 +1999,24 @@ class App {
   hideAudioBar() {
     const bar = document.getElementById('audio-bar');
     if (bar) bar.classList.add('translate-y-32', 'opacity-0');
+  }
+
+  openGuideModal() {
+    const modal = document.getElementById('guide-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+
+  closeGuideModal() {
+    const modal = document.getElementById('guide-modal');
+    const chk = document.getElementById('chk-dont-show-guide-again');
+    if (chk && chk.checked) {
+      localStorage.setItem('seen_onboarding_guide', 'true');
+    }
+    if (modal) {
+      modal.classList.add('hidden');
+    }
   }
 
   openSpeechModal({ text, ipa }) {
