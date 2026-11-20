@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linguistics English AI | Nền tảng Tự học Tiếng Anh Chuyên sâu dưới Góc nhìn Ngôn ngữ học</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="h-full text-slate-800 antialiased flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-sm transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-900 via-brand-800 to-indigo-900 bg-clip-text text-transparent">
+              LINGUISTICS ENGLISH <span class="text-brand-600">AI</span>
+            </span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
+              Lăng kính Ngôn ngữ học
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 hidden sm:block">Từ cơ bản (A1) đến tinh thông (C2) qua IPA, Hình thái, Cú pháp & Ngữ dụng</p>
+        </div>
+      </div>
+
+      <!-- Quick Controls & User State -->
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        
+        <!-- Speech Accent Selector -->
+        <div class="hidden md:flex items-center bg-slate-100/80 rounded-lg p-1 border border-slate-200 text-xs font-medium">
+          <button id="btn-accent-us" class="px-2.5 py-1 rounded-md bg-white text-brand-700 shadow-sm font-semibold transition-all">
+            🇺🇸 Mỹ (GA)
+          </button>
+          <button id="btn-accent-uk" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition-all">
+            🇬🇧 Anh (RP)
+          </button>
+        </div>
+
+        <!-- Speech Speed Selector -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-slate-100/80 rounded-lg px-2 py-1 border border-slate-200 text-xs text-slate-600">
+          <i data-lucide="gauge" class="w-3.5 h-3.5 text-brand-600"></i>
+          <select id="select-speech-rate" class="bg-transparent border-none text-xs font-medium focus:outline-none cursor-pointer">
+            <option value="0.75">0.75x (Chậm - Luyện âm)</option>
+            <option value="1.0" selected>1.0x (Tự nhiên)</option>
+            <option value="1.25">1.25x (Phản xạ nhanh)</option>
+          </select>
+        </div>
+
+        <!-- Streak Counter -->
+        <div class="flex items-center space-x-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xs" title="Chuỗi ngày học liên tục">
+          <i data-lucide="flame" class="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse"></i>
+          <span id="header-streak-count">1</span>
+          <span class="hidden sm:inline">ngày</span>
+        </div>
+
+        <!-- Diagnostic Level Badge -->
+        <button id="btn-header-level" class="flex items-center space-x-1.5 bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 px-3 py-1 rounded-lg text-xs font-bold transition-all">
+          <i data-lucide="award" class="w-4 h-4 text-brand-600"></i>
+          <span id="header-level-badge">A1 - Khởi đầu</span>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="btn-mobile-menu" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main App Layout -->
+  <div class="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-4 sm:py-6 gap-6">
+    
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-64 flex-shrink-0 bg-white rounded-2xl border border-slate-200 p-4 flex flex-col justify-between shadow-xs hidden lg:flex">
+      <div class="space-y-6">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">Học phần Ngôn ngữ học</span>
+          <nav class="mt-2 space-y-1">
+            <button data-nav="roadmap" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-700 bg-brand-50 border border-brand-100/80 transition-all">
+              <i data-lucide="map" class="w-4 h-4 text-brand-600"></i>
+              <span>Lộ trình CEFR A1-C2</span>
+            </button>
+            <button data-nav="phonetics" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="mic" class="w-4 h-4 text-slate-400"></i>
+              <span>Phòng Lab Ngữ âm IPA</span>
+            </button>
+            <button data-nav="morphology" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+              <span>Hình thái & Từ nguyên</span>
+            </button>
+            <button data-nav="grammar" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i>
+              <span>Cú pháp & Ngữ pháp</span>
+            </button>
+            <button data-nav="pragmatics" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="message-square-quote" class="w-4 h-4 text-slate-400"></i>
+              <span>Ngữ dụng & Diễn ngôn</span>
+            </button>
+            <button data-nav="shadowing" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="headphones" class="w-4 h-4 text-slate-400"></i>
+              <span>Shadowing & Luyện nói AI</span>
+            </button>
+          </nav>
+        </div>
+
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3">Công cụ & Đánh giá</span>
+          <nav class="mt-2 space-y-1">
+            <button data-nav="diagnostic" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="file-check-2" class="w-4 h-4 text-slate-400"></i>
+              <span>Thi chẩn đoán trình độ</span>
+            </button>
+            <button data-nav="profile" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+              <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+              <span>Hồ sơ & Sổ tay ghi nhớ</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Quick Linguistic Philosophy Card in Sidebar -->
+      <div class="bg-gradient-to-br from-indigo-50 via-brand-50 to-purple-50 rounded-xl p-3.5 border border-brand-100 text-xs">
+        <div class="flex items-center gap-2 text-brand-800 font-bold mb-1">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-600"></i>
+          <span>Nguyên lý Thụ đắc</span>
+        </div>
+        <p class="text-slate-600 leading-relaxed text-[11px]">
+          "Không học vẹt quy tắc. Nắm bắt bản chất âm vị học, giải mã gốc từ và tư duy ngữ pháp nhận thức."
+        </p>
+      </div>
+    </aside>
+
+    <!-- Main Dynamic Content Workspace -->
+    <main id="content-container" class="flex-1 bg-white rounded-2xl border border-slate-200 overflow-y-auto p-4 sm:p-6 lg:p-8 shadow-xs relative">
+      <!-- Dynamic Sections are rendered here by JavaScript -->
+    </main>
+
+  </div>
+
+  <!-- Global Sticky Audio / Pronunciation Bar -->
+  <div id="audio-bar" class="fixed bottom-4 right-4 max-w-md w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/90 p-4 z-50 transition-all transform translate-y-32 opacity-0 flex items-center justify-between">
+    <div class="flex items-center space-x-3 overflow-hidden">
+      <button id="audio-bar-play" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shadow-md shadow-brand-500/20 transition-all">
+        <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+      </button>
+      <div class="truncate">
+        <div id="audio-bar-text" class="text-sm font-bold text-slate-800 truncate">Select any text to speak</div>
+        <div id="audio-bar-sub" class="text-xs text-slate-400 flex items-center gap-2">
+          <span id="audio-bar-phonetic" class="font-mono text-brand-600">/phonetics/</span>
+          <span id="audio-bar-accent">🇺🇸 US English</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <div id="audio-bar-wave" class="pulse-wave hidden">
+        <div class="pulse-bar"></div>
+        <div class="pulse-bar"></div>
+        <div class="pulse-bar"></div>
+        <div class="pulse-bar"></div>
+        <div class="pulse-bar"></div>
+      </div>
+      <button id="audio-bar-close" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Interactive Speech Recognition Modal -->
+  <div id="speech-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6 animate-scale-up">
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center">
+            <i data-lucide="mic" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Kiểm tra Ngữ âm bằng Giọng nói AI</h3>
+            <p class="text-xs text-slate-500">Đọc câu mẫu vào microphone để nhận phản hồi ngữ âm tức thì</p>
+          </div>
+        </div>
+        <button id="close-speech-modal" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Target Sentence Display -->
+      <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Câu mục tiêu:</div>
+        <p id="speech-target-text" class="text-base sm:text-lg font-bold text-slate-800 leading-snug">
+          "Language is not merely a tool for communication; it is a mirror of the human mind."
+        </p>
+        <p id="speech-target-ipa" class="text-xs font-mono text-brand-600 mt-1.5">
+          /ˈlæŋɡwɪdʒ ɪz nɒt ˈmɪəli ə tuːl fə kəˌmjuːnɪˈkeɪʃn.../
+        </p>
+      </div>
+
+      <!-- Live User Speech Feedback Area -->
+      <div class="bg-brand-50/50 rounded-2xl p-4 border border-brand-100 min-h-[90px] flex flex-col justify-center">
+        <div class="text-xs font-semibold text-brand-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+          <span>Giọng nói của bạn:</span>
+        </div>
+        <div id="speech-live-transcript" class="text-slate-700 italic text-sm">
+          Nhấn nút Microphone bên dưới và đọc to rõ ràng...
+        </div>
+      </div>
+
+      <!-- Evaluation Result Container (Hidden until speech completed) -->
+      <div id="speech-result-container" class="hidden space-y-3">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-slate-700">Độ chính xác ngữ âm:</span>
+            <span id="speech-accuracy-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">92%</span>
+          </div>
+          <span id="speech-rating-text" class="text-xs font-semibold text-slate-500">Tuyệt vời!</span>
+        </div>
+        <div id="speech-word-breakdown" class="text-xs flex flex-wrap gap-1.5 p-2 bg-slate-50/60 rounded-xl">
+          <!-- Colored words: green for match, red for missed -->
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center justify-center gap-4 pt-2">
+        <button id="btn-listen-sample" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold flex items-center gap-2 transition-all">
+          <i data-lucide="volume-2" class="w-4 h-4 text-brand-600"></i>
+          <span>Nghe người bản ngữ đọc</span>
+        </button>
+
+        <button id="btn-toggle-record" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-all">
+          <i data-lucide="mic" class="w-4 h-4"></i>
+          <span id="btn-toggle-record-text">Bắt đầu Thu âm</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Main Logic Modules -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

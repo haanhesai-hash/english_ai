@@ -1,0 +1,23 @@
+{
+  "name": "linguistics-english-ai",
+  "version": "1.0.0",
+  "description": "Nền tảng Tự học Tiếng Anh Toàn diện dưới Lăng kính Ngôn ngữ học & Trí tuệ Nhân tạo",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  },
+  "keywords": [
+    "english-learning",
+    "linguistics",
+    "ipa",
+    "cefr",
+    "morphology",
+    "phonology",
+    "syntax",
+    "ai"
+  ],
+  "author": "Linguist & AI Specialist",
+  "license": "MIT"
+}
