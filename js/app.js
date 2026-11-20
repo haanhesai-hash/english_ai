@@ -1132,17 +1132,18 @@ class App {
                       <div>
                         <div class="flex items-center justify-between">
                           <span class="font-bold text-slate-900 text-sm">${d.word}</span>
-                          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-200">${d.pos}</span>
+                          <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-white text-brand-700 border border-brand-200">${d.posVi ? `${d.posVi} (${d.pos})` : d.pos}</span>
                         </div>
                         <div class="font-mono text-[11px] text-brand-600">${d.breakdown}</div>
-                        <div class="text-xs text-slate-600 mt-1">${d.meaning}</div>
-                        <div class="text-[11px] text-slate-500 italic mt-1 bg-white p-1.5 rounded border border-slate-200/60">
-                          "${d.example}"
+                        <div class="text-xs text-slate-700 font-medium mt-1">${d.meaning}</div>
+                        <div class="text-[11px] text-slate-600 mt-1.5 bg-white p-2 rounded-lg border border-slate-200/60 space-y-0.5">
+                          <div class="italic font-medium text-slate-800">"${d.example}"</div>
+                          ${d.exampleVi ? `<div class="text-[10.5px] text-slate-500">👉 ${d.exampleVi}</div>` : ''}
                         </div>
                       </div>
 
                       <div class="pt-2 flex items-center justify-between border-t border-slate-100">
-                        <span class="text-[10px] font-semibold text-slate-400">Cụm: ${d.collocation}</span>
+                        <span class="text-[10px] font-semibold text-slate-500">Cụm: <span class="text-brand-700">${d.collocation}</span></span>
                         <button class="btn-play-word p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-brand-600 transition-colors" data-word="${d.word}" data-ipa="${d.word}">
                           <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
                         </button>
@@ -1264,7 +1265,7 @@ class App {
             <!-- Card Front / Back toggle badge -->
             <div class="flex items-center justify-between w-full">
               <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
-                ${currentCard.pos}
+                ${currentCard.posVi ? `${currentCard.posVi} (${currentCard.pos})` : currentCard.pos}
               </span>
               <button class="btn-play-word p-2 rounded-xl bg-slate-50 hover:bg-brand-50 text-brand-600 transition-colors" data-word="${currentCard.word}" data-ipa="${currentCard.ipa}">
                 <i data-lucide="volume-2" class="w-5 h-5"></i>
@@ -1275,13 +1276,14 @@ class App {
             <div class="text-center space-y-2 py-4">
               <h3 class="text-3xl font-extrabold text-slate-900 tracking-tight">${currentCard.word}</h3>
               <div class="font-mono text-sm text-brand-600">${currentCard.ipa}</div>
-              <p class="text-sm text-slate-600 pt-2 font-medium">${currentCard.meaning}</p>
+              <p class="text-sm text-slate-700 pt-2 font-bold">${currentCard.meaning}</p>
             </div>
 
             <!-- Extra Details -->
-            <div class="bg-slate-50 rounded-2xl p-3 text-xs text-left border border-slate-100 space-y-1">
-              <div class="text-slate-500"><strong>Word family:</strong> ${currentCard.family}</div>
-              <div class="text-slate-700 italic">"${currentCard.example}"</div>
+            <div class="bg-slate-50 rounded-2xl p-3 text-xs text-left border border-slate-100 space-y-1.5">
+              <div class="text-slate-600"><strong>Họ từ vựng liên quan:</strong> <span class="font-mono text-brand-700 font-semibold">${currentCard.family}</span></div>
+              <div class="text-slate-800 italic">"${currentCard.example}"</div>
+              ${currentCard.exampleVi ? `<div class="text-[11px] text-slate-500 not-italic">👉 ${currentCard.exampleVi}</div>` : ''}
             </div>
 
             <div class="text-[10px] text-center text-slate-400">
@@ -1641,6 +1643,7 @@ class App {
                         Thân mật (Casual)
                       </span>
                       <p class="text-xs font-semibold text-slate-800 mt-2">"${item.casual}"</p>
+                      ${item.casualVi ? `<p class="text-[11px] text-amber-900/80 mt-1 italic">👉 ${item.casualVi}</p>` : ''}
                     </div>
                     <button class="btn-play-word mt-2 w-full py-1 rounded bg-white hover:bg-amber-50 text-amber-800 text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200 transition-colors" data-word="${item.casual}">
                       <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
@@ -1655,6 +1658,7 @@ class App {
                         Công sở (Neutral)
                       </span>
                       <p class="text-xs font-semibold text-slate-800 mt-2">"${item.neutral}"</p>
+                      ${item.neutralVi ? `<p class="text-[11px] text-blue-900/80 mt-1 italic">👉 ${item.neutralVi}</p>` : ''}
                     </div>
                     <button class="btn-play-word mt-2 w-full py-1 rounded bg-white hover:bg-blue-50 text-blue-800 text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200 transition-colors" data-word="${item.neutral}">
                       <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
@@ -1669,6 +1673,7 @@ class App {
                         Trang trọng (Formal / C1-C2)
                       </span>
                       <p class="text-xs font-semibold text-slate-800 mt-2">"${item.formal}"</p>
+                      ${item.formalVi ? `<p class="text-[11px] text-purple-900/80 mt-1 italic">👉 ${item.formalVi}</p>` : ''}
                     </div>
                     <button class="btn-play-word mt-2 w-full py-1 rounded bg-white hover:bg-purple-50 text-purple-800 text-[11px] font-semibold flex items-center justify-center gap-1 border border-slate-200 transition-colors" data-word="${item.formal}">
                       <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
@@ -1696,7 +1701,8 @@ class App {
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1 text-xs">
                   <div class="font-bold text-brand-800">${d.category}</div>
                   <div class="font-mono text-[11px] text-slate-600">${d.words}</div>
-                  <div class="text-[11px] text-slate-500 italic pt-1">"${d.example}"</div>
+                  <div class="text-[11px] text-slate-700 italic pt-1">"${d.example}"</div>
+                  ${d.exampleVi ? `<div class="text-[10.5px] text-slate-500 not-italic">👉 ${d.exampleVi}</div>` : ''}
                 </div>
               `).join('')}
             </div>
@@ -1722,18 +1728,22 @@ class App {
 
               <!-- Dialogue flow -->
               <div class="space-y-2.5">
-                ${sc.dialogue.map(d => `
-                  <div class="p-3 rounded-xl ${d.speaker === 'You' ? 'bg-brand-50/70 border border-brand-200 ml-4' : 'bg-slate-50 border border-slate-200/80 mr-4'} space-y-1">
+                ${sc.dialogue.map(d => {
+                  const isUser = d.speaker.includes('Bạn') || d.speaker === 'You';
+                  return `
+                  <div class="p-3 rounded-xl ${isUser ? 'bg-brand-50/70 border border-brand-200 ml-4' : 'bg-slate-50 border border-slate-200/80 mr-4'} space-y-1">
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold ${d.speaker === 'You' ? 'text-brand-700' : 'text-slate-700'}">${d.speaker}</span>
+                      <span class="text-xs font-bold ${isUser ? 'text-brand-700' : 'text-slate-700'}">${d.speaker}</span>
                       <button class="btn-play-word text-slate-400 hover:text-brand-600" data-word="${d.text}">
                         <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
                       </button>
                     </div>
                     <p class="text-xs sm:text-sm font-semibold text-slate-800">${d.text}</p>
+                    ${d.vi ? `<p class="text-xs text-slate-600 font-medium pt-0.5">👉 ${d.vi}</p>` : ''}
                     <p class="text-[10px] font-mono text-slate-400">${d.ipa}</p>
                   </div>
-                `).join('')}
+                  `;
+                }).join('')}
               </div>
 
               <!-- Cultural Tip -->
@@ -1804,6 +1814,7 @@ class App {
               <!-- Main script & IPA -->
               <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-100 space-y-2">
                 <p class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">${p.text}</p>
+                ${p.translationVi ? `<p class="text-xs sm:text-sm text-slate-600 italic bg-white p-3 rounded-xl border border-slate-200/70">👉 <strong>Dịch nghĩa tiếng Việt:</strong> "${p.translationVi}"</p>` : ''}
                 <p class="text-xs font-mono text-brand-600 leading-relaxed pt-1">${p.ipa}</p>
               </div>
 
