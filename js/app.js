@@ -155,6 +155,158 @@ class App {
       });
     }
 
+    // Auth modal controls
+    const btnStudentAcc = document.getElementById('btn-student-account');
+    if (btnStudentAcc) {
+      btnStudentAcc.addEventListener('click', () => this.openAuthModal());
+    }
+
+    const btnSidebarAcc = document.getElementById('btn-sidebar-account');
+    if (btnSidebarAcc) {
+      btnSidebarAcc.addEventListener('click', () => this.openAuthModal());
+    }
+
+    const closeAuthModal = document.getElementById('close-auth-modal');
+    if (closeAuthModal) {
+      closeAuthModal.addEventListener('click', () => this.closeAuthModal());
+    }
+
+    // Auth modal tabs
+    const tabAuthSwitch = document.getElementById('tab-auth-switch');
+    const tabAuthRegister = document.getElementById('tab-auth-register');
+    const tabAuthBackup = document.getElementById('tab-auth-backup');
+
+    if (tabAuthSwitch) {
+      tabAuthSwitch.addEventListener('click', () => this.switchAuthTab('login'));
+    }
+    if (tabAuthRegister) {
+      tabAuthRegister.addEventListener('click', () => this.switchAuthTab('register'));
+    }
+    if (tabAuthBackup) {
+      tabAuthBackup.addEventListener('click', () => this.switchAuthTab('backup'));
+    }
+
+    // Login form submit
+    const formLogin = document.getElementById('form-auth-login');
+    if (formLogin) {
+      formLogin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errEl = document.getElementById('login-error-msg');
+        try {
+          this.storage.login(email, password);
+          this.closeAuthModal();
+          this.updateHeaderUI();
+          this.navigateTo(this.currentView);
+          this.showToast(`Chào mừng ${this.storage.currentUser.name} quay trở lại!`);
+        } catch (err) {
+          if (errEl) {
+            errEl.textContent = err.message;
+            errEl.classList.remove('hidden');
+          }
+        }
+      });
+    }
+
+    // Register form submit
+    const formRegister = document.getElementById('form-auth-register');
+    if (formRegister) {
+      formRegister.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const targetLevel = document.getElementById('reg-target-level').value;
+        const errEl = document.getElementById('reg-error-msg');
+        try {
+          this.storage.register(name, email, password, targetLevel);
+          this.closeAuthModal();
+          this.updateHeaderUI();
+          this.navigateTo('roadmap');
+          this.showToast(`Đã tạo hồ sơ cho học viên ${name}!`);
+        } catch (err) {
+          if (errEl) {
+            errEl.textContent = err.message;
+            errEl.classList.remove('hidden');
+          }
+        }
+      });
+    }
+
+    // Export JSON
+    const btnExport = document.getElementById('btn-export-json');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        const data = this.storage.exportUserData();
+        if (!data) {
+          this.showToast("Chưa có học sinh nào đang đăng nhập để xuất dữ liệu.");
+          return;
+        }
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const email = this.storage.currentUser ? this.storage.currentUser.email.split('@')[0] : 'hocsinh';
+        a.href = url;
+        a.download = `lo-trinh-tieng-anh-${email}-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.showToast("Đã tải tệp sao lưu lộ trình về máy!");
+      });
+    }
+
+    // Import JSON
+    const inputImport = document.getElementById('input-import-json');
+    if (inputImport) {
+      inputImport.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = this.storage.importUserData(event.target.result);
+            this.closeAuthModal();
+            this.updateHeaderUI();
+            this.navigateTo(this.currentView);
+            this.showToast(`Đã khôi phục thành công lộ trình của học viên ${imported.name}!`);
+          } catch (err) {
+            alert(`Lỗi khi đọc tệp sao lưu: ${err.message}`);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Logout
+    const btnModalLogout = document.getElementById('btn-modal-logout');
+    if (btnModalLogout) {
+      btnModalLogout.addEventListener('click', () => {
+        this.storage.logout();
+        this.closeAuthModal();
+        this.updateHeaderUI();
+        this.navigateTo('roadmap');
+        this.showToast("Đã đăng xuất học viên.");
+      });
+    }
+
+    // Delete Account
+    const btnModalDeleteAcc = document.getElementById('btn-modal-delete-acc');
+    if (btnModalDeleteAcc) {
+      btnModalDeleteAcc.addEventListener('click', () => {
+        if (!this.storage.currentUser) return;
+        const email = this.storage.currentUser.email;
+        if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ học viên '${email}' khỏi máy này không?`)) {
+          this.storage.deleteAccount(email);
+          this.closeAuthModal();
+          this.updateHeaderUI();
+          this.navigateTo('roadmap');
+          this.showToast("Đã xóa hồ sơ học viên khỏi thiết bị.");
+        }
+      });
+    }
+
     // Speech modal controls
     const closeSpeechModal = document.getElementById('close-speech-modal');
     if (closeSpeechModal) {
@@ -177,7 +329,9 @@ class App {
   }
 
   updateHeaderUI() {
+    const user = this.storage.currentUser;
     const profile = this.storage.profile;
+
     const streakEl = document.getElementById('header-streak-count');
     if (streakEl) streakEl.textContent = profile.streak || 1;
 
@@ -186,6 +340,23 @@ class App {
       levelBadgeEl.textContent = profile.cefrBadge 
         ? `${profile.cefrBadge} - ${profile.level}` 
         : 'A1 - Khởi đầu';
+    }
+
+    const userNameEl = document.getElementById('header-user-name');
+    const userEmailEl = document.getElementById('header-user-email');
+    const avatarEl = document.getElementById('header-avatar');
+
+    if (user) {
+      if (userNameEl) userNameEl.textContent = user.name || 'Học viên';
+      if (userEmailEl) userEmailEl.textContent = user.email || '';
+      if (avatarEl) {
+        const initial = (user.name || 'H').charAt(0).toUpperCase();
+        avatarEl.textContent = initial;
+      }
+    } else {
+      if (userNameEl) userNameEl.textContent = 'Đăng nhập';
+      if (userEmailEl) userEmailEl.textContent = 'Chọn học viên';
+      if (avatarEl) avatarEl.textContent = '+';
     }
   }
 
@@ -1862,6 +2033,7 @@ class App {
    * 8. LEARNER PROFILE & NOTEBOOK (HỒ SƠ, THỐNG KÊ & SỔ TAY)
    * ========================================================================= */
   renderProfile(container) {
+    const user = this.storage.currentUser;
     const profile = this.storage.profile;
 
     container.innerHTML = `
@@ -1876,6 +2048,34 @@ class App {
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
             Theo dõi sự chuyển biến năng lực ngôn ngữ, lịch sử bài thi và thời gian học tập tích lũy.
           </p>
+        </div>
+
+        <!-- Student Info Banner -->
+        <div class="bg-gradient-to-r from-brand-900 via-indigo-900 to-slate-900 rounded-3xl p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg border border-brand-800">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-white/10 text-white font-black text-2xl flex items-center justify-center border border-white/20 shadow-inner">
+              ${(user?.name || 'H').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-xl font-bold text-white">${user?.name || 'Học viên'}</h3>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/30 text-brand-200 border border-brand-400/30">
+                  Mục tiêu: ${user?.targetLevel || 'B2'}
+                </span>
+              </div>
+              <p class="text-xs text-slate-300 mt-0.5">${user?.email || 'Chưa đăng nhập'}</p>
+              <div class="text-[11px] text-slate-400 mt-1">Ngày tham gia: ${user?.joinedDate || 'Gần đây'}</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button id="btn-profile-switch-acc" class="px-4 py-2 rounded-xl bg-white text-brand-900 font-bold text-xs hover:bg-slate-100 transition-all shadow-sm">
+              Đổi / Thêm Học Viên
+            </button>
+            <button id="btn-profile-backup" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-all">
+              Sao Lưu / Xuất File
+            </button>
+          </div>
         </div>
 
         <!-- Metrics Cards -->
@@ -1956,6 +2156,16 @@ class App {
       </div>
     `;
 
+    const btnProfileSwitch = container.querySelector('#btn-profile-switch-acc');
+    if (btnProfileSwitch) {
+      btnProfileSwitch.addEventListener('click', () => this.openAuthModal('login'));
+    }
+
+    const btnProfileBackup = container.querySelector('#btn-profile-backup');
+    if (btnProfileBackup) {
+      btnProfileBackup.addEventListener('click', () => this.openAuthModal('backup'));
+    }
+
     const resetBtn = container.querySelector('#btn-reset-storage');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
@@ -1999,6 +2209,109 @@ class App {
   hideAudioBar() {
     const bar = document.getElementById('audio-bar');
     if (bar) bar.classList.add('translate-y-32', 'opacity-0');
+  }
+
+  openAuthModal(defaultTab = 'login') {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      this.switchAuthTab(defaultTab);
+      this.renderAuthAccountList();
+    }
+  }
+
+  closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  switchAuthTab(tab) {
+    const panelLogin = document.getElementById('auth-panel-login');
+    const panelRegister = document.getElementById('auth-panel-register');
+    const panelBackup = document.getElementById('auth-panel-backup');
+
+    const tabSwitch = document.getElementById('tab-auth-switch');
+    const tabRegister = document.getElementById('tab-auth-register');
+    const tabBackup = document.getElementById('tab-auth-backup');
+
+    if (panelLogin) panelLogin.classList.toggle('hidden', tab !== 'login');
+    if (panelRegister) panelRegister.classList.toggle('hidden', tab !== 'register');
+    if (panelBackup) panelBackup.classList.toggle('hidden', tab !== 'backup');
+
+    const activeCls = 'flex-1 py-2 rounded-lg transition-all bg-white text-brand-700 shadow-xs';
+    const inactiveCls = 'flex-1 py-2 rounded-lg transition-all text-slate-600 hover:text-slate-900';
+
+    if (tabSwitch) tabSwitch.className = tab === 'login' ? activeCls : inactiveCls;
+    if (tabRegister) tabRegister.className = tab === 'register' ? activeCls : inactiveCls;
+    if (tabBackup) tabBackup.className = tab === 'backup' ? activeCls : inactiveCls;
+
+    if (tab === 'login') {
+      this.renderAuthAccountList();
+    }
+  }
+
+  renderAuthAccountList() {
+    const listEl = document.getElementById('auth-account-list');
+    if (!listEl) return;
+
+    const accounts = this.storage.getAccountList();
+    const currentEmail = this.storage.currentUser?.email;
+
+    if (accounts.length === 0) {
+      listEl.innerHTML = `
+        <div class="text-xs text-slate-400 italic p-3 text-center bg-slate-50 rounded-xl">
+          Chưa có học sinh nào lưu trên máy. Hãy chuyển sang tab "Tạo Học Viên Mới" để bắt đầu!
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = accounts.map(acc => {
+      const isCurrent = acc.email === currentEmail;
+      const initial = (acc.name || 'H').charAt(0).toUpperCase();
+
+      return `
+        <div class="flex items-center justify-between p-2.5 rounded-xl border ${isCurrent ? 'border-brand-500 bg-brand-50/60' : 'border-slate-200 bg-slate-50 hover:bg-slate-100/70'} transition-all text-xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg ${isCurrent ? 'bg-brand-600' : 'bg-slate-400'} text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
+              ${initial}
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-800 flex items-center gap-1.5 truncate">
+                <span>${acc.name}</span>
+                ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-brand-600 text-white font-semibold">Đang học</span>' : ''}
+              </div>
+              <div class="text-[10px] text-slate-400 truncate">${acc.email}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-semibold">
+              ${acc.cefrBadge} • 🔥${acc.streak}d
+            </span>
+            ${!isCurrent ? `
+              <button class="btn-quick-switch px-2.5 py-1 rounded-lg bg-white hover:bg-brand-50 text-brand-700 border border-slate-200 text-xs font-semibold shadow-2xs transition-colors" data-email="${acc.email}">
+                Chọn học
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Bind quick switch buttons
+    listEl.querySelectorAll('.btn-quick-switch').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const email = e.currentTarget.getAttribute('data-email');
+        this.storage.switchUser(email);
+        this.closeAuthModal();
+        this.updateHeaderUI();
+        this.navigateTo(this.currentView);
+        this.showToast(`Đã chuyển sang học viên ${this.storage.currentUser.name}!`);
+      });
+    });
   }
 
   openGuideModal() {
